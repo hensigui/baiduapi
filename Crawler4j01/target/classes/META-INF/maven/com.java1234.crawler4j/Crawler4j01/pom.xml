@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.java1234.crawler4j</groupId>
+  <artifactId>Crawler4j01</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+	
+	<build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<version>2.3.2</version>
+  			<configuration>
+  				<source>${java.version}</source>
+  				<target>${java.version}</target>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+  
+  
+  <dependencies>
+  	<dependency>
+        <groupId>edu.uci.ics</groupId>
+        <artifactId>crawler4j</artifactId>
+        <version>4.2</version>
+    </dependency>
+    
+    <!-- 加入log4j支持 -->
+    <dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.17</version>
+	</dependency>
+	
+	<!-- 加入slf4j log4j驱动类 -->
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-log4j12</artifactId>
+	    <version>1.7.21</version>
+	</dependency>
+  </dependencies>
+  
+</project>
