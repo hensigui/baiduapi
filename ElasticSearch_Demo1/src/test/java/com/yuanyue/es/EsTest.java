@@ -3,8 +3,10 @@ package com.yuanyue.es;
 import static org.junit.Assert.*;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -25,6 +27,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
+import org.elasticsearch.xpack.core.XPackClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,11 +38,18 @@ import com.alibaba.fastjson.JSONObject;
 
 public class EsTest {
 	
-    private static String host="192.168.2.188"; // 服务器地址
+    private static String host="192.168.2.187"; // 服务器地址
     
     private static int port=9300; // 端口
      
     private TransportClient client=null;
+    
+    private static List<String> hostList = new ArrayList<String>();
+    
+    static {
+    	hostList.add("192.168.2.187");
+    	hostList.add("192.168.2.137");
+    }
   
      
     /**
@@ -48,9 +59,18 @@ public class EsTest {
     @SuppressWarnings({ "unchecked", "resource" })
     @Before
     public void getCient()throws Exception{
+    	TransportAddress[] transportAddresses = new TransportAddress[hostList.size()];
+    	for(int i=0;i<transportAddresses.length;i++) {
+    		transportAddresses[i]=new TransportAddress(InetAddress.getByName(EsTest.hostList.get(i)), EsTest.port);
+    	}
     	// 设定集群名称
-       client = new PreBuiltTransportClient(Settings.builder().put("cluster.name", "my-application").build())
-               .addTransportAddress(new TransportAddress(InetAddress.getByName(EsTest.host), EsTest.port));
+       client = new PreBuiltXPackTransportClient(Settings.builder().put("cluster.name", "my-elasticsearch")
+    		   .put("xpack.security.transport.ssl.enabled", false)
+               .put("xpack.security.user", "elastic:qx1234")
+               .put("client.transport.sniff", true)
+    		   .build())
+    		   .addTransportAddresses(transportAddresses);
+               //.addTransportAddress(new TransportAddress(InetAddress.getByName(EsTest.host), EsTest.port));
     }
      
     /**
@@ -441,6 +461,28 @@ public class EsTest {
         for(SearchHit hit:hits){
             System.out.println(hit.getSourceAsString());
         }
+    }
+    
+
+    
+    /**
+     * 精确匹配某个值
+     * @throws Exception
+     */
+    @Test
+    public void search3()throws Exception{
+    	long before = System.currentTimeMillis();
+        SearchRequestBuilder srb=client.prepareSearch("movies").setTypes("movie");
+        SearchResponse sr = srb.setQuery(QueryBuilders.matchPhraseQuery("title", "Godfather"))
+            .execute()
+            .actionGet(); 
+        SearchHits hits=sr.getHits();
+        for(SearchHit hit:hits){
+        	System.out.println(hit.getSourceAsMap());
+            //System.out.println(hit.getSourceAsString());
+        }
+        long after = System.currentTimeMillis();
+        System.out.println("时间："+(after-before));
     }
 
 }
